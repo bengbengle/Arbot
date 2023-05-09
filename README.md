@@ -15,7 +15,7 @@ The library is made up of three main components:
 
 The following strategies have been implemented: 
 
-- [Opensea/Sudoswap NFT Arbitrage](/crates/strategies/opensea-sudo-arb/): A strategy implementing atomic, cross-market NFT arbitrage between Seaport and Sudoswap.
+- [Opensea/Sudoswap NFT Arbitrage](/crates/strategies/arb/): A strategy implementing atomic, cross-market NFT arbitrage between Seaport and Sudoswap.
 
 ## Build, Test and Run
 
@@ -41,7 +41,7 @@ cargo run --
 
 ```
 
-where `ARB_CONTRACT_ADDRESS` is the address to which you deploy the [arb contract](/crates/strategies/opensea-sudo-arb/contracts/src/SudoOpenseaArb.sol).
+where `ARB_CONTRACT_ADDRESS` is the address to which you deploy the [arb contract](/crates/strategies/arb/contracts/src/SudoOpenseaArb.sol).
 
 
 ## Acknowledgements

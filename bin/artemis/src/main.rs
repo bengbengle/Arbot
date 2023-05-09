@@ -14,8 +14,8 @@ use artemis_core::executors::mempool_executor::MempoolExecutor;
 
 use ethers::signers::{LocalWallet, Signer};
 
-use opensea_sudo_arb::strategy::OpenseaSudoArb;
-use opensea_sudo_arb::types::{Action, Config, Event};
+use arb::strategy::OpenseaSudoArb;
+use arb::types::{Action, Config, Event};
 
 use tracing::{info, Level};
 use tracing_subscriber::{filter, prelude::*};
@@ -73,7 +73,7 @@ async fn main() -> Result<()> {
     
     // Set up tracing and parse args                                       // 设置追踪和解析参数。
     let filter = filter::Targets::new()
-        .with_target("opensea_sudo_arb", Level::INFO)
+        .with_target("arb", Level::INFO)
         .with_target("artemis_core", Level::INFO);
 
     tracing_subscriber::registry()
