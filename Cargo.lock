@@ -119,7 +119,7 @@ name = "arb"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "artemis-core",
+ "arbot-core",
  "async-trait",
  "bindings",
  "dotenv",
@@ -133,32 +133,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "arrayvec"
-version = "0.7.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8da52d66c7071e2e3fa2a1e5c6d088fec47b593032b254f5e980de8ea54454d6"
-
-[[package]]
-name = "artemis"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "arb",
- "artemis-core",
- "async-trait",
- "clap 4.2.7",
- "dotenv",
- "ethers",
- "futures",
- "opensea-stream",
- "opensea-v2",
- "tokio",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "artemis-core"
+name = "arbot-core"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -178,6 +153,31 @@ dependencies = [
  "tokio-stream",
  "tokio-tungstenite 0.18.0",
  "tracing",
+]
+
+[[package]]
+name = "arrayvec"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8da52d66c7071e2e3fa2a1e5c6d088fec47b593032b254f5e980de8ea54454d6"
+
+[[package]]
+name = "artemis"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "arb",
+ "arbot-core",
+ "async-trait",
+ "clap 4.2.7",
+ "dotenv",
+ "ethers",
+ "futures",
+ "opensea-stream",
+ "opensea-v2",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

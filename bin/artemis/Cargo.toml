@@ -10,7 +10,7 @@ ethers = { version = "2", features = ["ws", "rustls"]}
 tokio = { version = "1.18", features = ["full"] }
 dotenv = "0.15.0"
 async-trait = "0.1.64"
-artemis-core = { path = "../../crates/artemis-core" }
+arbot-core = { path = "../../crates/arbot-core" }
 opensea-stream = { git = "https://github.com/FrankieIsLost/opensea-stream-rs"}
 futures = "0.3.27"
 opensea-v2 = { path = "../../crates/clients/opensea-v2" }
