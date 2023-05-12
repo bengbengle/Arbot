@@ -9,6 +9,7 @@ edition = "2021"
 ethers = { version = "2", features = ["ws", "rustls"]}
 tokio = { version = "1.18", features = ["full"] }
 dotenv = "0.15.0"
+
 async-trait = "0.1.64"
 arbot-core = { path = "../../arbot-core" }
 bindings = { path = "./bindings" }

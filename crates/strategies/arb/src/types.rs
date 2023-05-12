@@ -2,8 +2,18 @@ use arbot_core::{
     collectors::{block_collector::NewBlock, opensea_order_collector::OpenseaOrder},
     executors::mempool_executor::SubmitTxToMempool,
 };
-use bindings::zone_interface::{AdditionalRecipient, BasicOrderParameters};
-use ethers::types::{Chain, H160, H256};
+
+use bindings::zone_interface::{
+    AdditionalRecipient, 
+    BasicOrderParameters
+};
+
+use ethers::types::{
+    Chain, 
+    H160, 
+    H256
+};
+
 use opensea_v2::types::{
     FulfillListingRequest, 
     FulfillListingResponse, 
@@ -25,16 +35,16 @@ pub enum Action {
     SubmitTx(SubmitTxToMempool),                                        // 提交交易
 }
 
-/// Configuration for variables we need to pass to the strategy.        // 我们需要传递给策略的 配置变量
+///  我们需要传递给策略的 配置变量
 #[derive(Debug, Clone)]
 pub struct Config {
     pub arb_contract_address: H160,                                     // 套利合约 地址
     pub bid_percentage: u64,                                            // 利润的百分比
 }
 
-/// Convenience function to convert a hash to a fulfill listing request         
 /// 将哈希转换为 fulfill listing 请求 的 函数
 pub fn hash_to_fulfill_listing_request(hash: H256) -> FulfillListingRequest {
+
     FulfillListingRequest {
         listing: Listing {
             hash,
@@ -49,6 +59,8 @@ pub fn hash_to_fulfill_listing_request(hash: H256) -> FulfillListingRequest {
 
 /// 将 fulfill listing 响应 转换为 基本订单参数 的 函数
 pub fn fulfill_listing_response_to_basic_order_parameters(val: FulfillListingResponse) -> BasicOrderParameters {
+
+    println!("购买成功, fulfill_listing_response_to_basic_order_parameters: {:?}", val);
 
     let params = val.fulfillment_data.transaction.input_data.parameters;
 

@@ -20,6 +20,7 @@ use arbot_core::utilities::state_override_middleware::StateOverrideMiddleware;
 use ethers::providers::Middleware;
 use ethers::types::{Filter, H256};
 use ethers::types::{H160, U256};
+
 use opensea_stream::schema::Chain;
 use opensea_v2::client::OpenSeaV2Client;
 
@@ -33,39 +34,55 @@ use super::types::{
 
 #[derive(Debug, Clone)]
 pub struct OpenseaSudoArb<M> {
-    /// Ethers client.                                                      
-    client: Arc<M>,                                                         // Ethers 客户端
-    /// Opensea V2 client                                                   
-    opensea_client: OpenSeaV2Client,                                        // OpenSeaV2 客户端
-    /// LSSVM pair factory contract for getting pair history.               
-    lssvm_pair_factory: Arc<LSSVMPairFactory<M>>,                           // LSSVM pair factory 合约, 用于获取 pair 历史    
-    /// Quoter for batch reading pair state.
-    quoter: SudoPairQuoter<StateOverrideMiddleware<Arc<M>>>,                // Sudo pair quoter 合约, 用于批量读取 pair 状态
-    /// Arb contract.
-    arb_contract: SudoOpenseaArb<M>,                                        // Arb 合约
-    /// Map NFT addresses to a list of Sudo pair addresses which trade that NFT.    
-    sudo_pools: HashMap<H160, Vec<H160>>,                                   // NFT 地址映射到 交易该 NFT 的 Sudo pair 地址列表
-    /// Map Sudo pool addresses to the current bid for that pool (in ETH).
-    pool_bids: HashMap<H160, U256>,                                         // Sudo pool 地址映射到当前的出价 (以 ETH 为单位)
-    /// Amount of profits to bid in gas
-    bid_percentage: u64,                                                    // 利润的百分比
+    /// Ethers 客户端                                                   
+    client: Arc<M>,                                                         
+
+    /// Opensea V2 客户端                             
+    opensea_client: OpenSeaV2Client,                                       
+
+    /// 用于获取 pair 历史的 LSSVM pair factory 合约               
+    lssvm_pair_factory: Arc<LSSVMPairFactory<M>>,                             
+
+    /// 批量读取 pair 状态的 Quoter
+    quoter: SudoPairQuoter<StateOverrideMiddleware<Arc<M>>>,
+
+    /// Arb 合约
+    arb_contract: SudoOpenseaArb<M>,                                        
+
+    /// Map NFT 地址到 交易该 NFT 的 Sudo pair 地址列表    
+    sudo_pools: HashMap<H160, Vec<H160>>,              
+
+    /// Map Sudo pool 地址到当前的出价 (以 ETH 为单位) pool addresses--> current bid Map (in ETH)
+    pool_bids: HashMap<H160, U256>,                                         
+
+    /// 出价的利润数量
+    bid_percentage: u64,
 }
 
 impl<M: Middleware + 'static> OpenseaSudoArb<M> {
-    /// Get all Sudo pools deployed in the block range.
 
+    /// 获取 block 范围内部署的所有 pools
     pub fn new(client: Arc<M>, opensea_client: OpenSeaV2Client, config: Config) -> Self {
-        // Set up LSSVM pair factory contract.
-        let lssvm_pair_factory = Arc::new(LSSVMPairFactory::new(*LSSVM_PAIR_FACTORY_ADDRESS, client.clone()));
-        // Set up Sudo pair quoter contract.
-        // 设置 Sudo pair quoter 合约
+
+        // 设置 Pair factory 合约
+        let lssvm_pair_factory = Arc::new(
+            LSSVMPairFactory::new(*LSSVM_PAIR_FACTORY_ADDRESS, client.clone())
+            );
+
+        // 设置 pair quoter 合约
         let mut state_override = StateOverrideMiddleware::new(client.clone());
-        // Override account with contract bytecode
+        
+        // 重写账户，使用合约的字节码
         let addr = state_override.add_code(SUDOPAIRQUOTER_DEPLOYED_BYTECODE.clone());
-        // Instantiate contract with override client
+
+        // 使用重写的 客户端 实例化合约
         let quoter = SudoPairQuoter::new(addr, Arc::new(state_override));
-        // Set up arb contract.
-        let arb_contract = SudoOpenseaArb::new(config.arb_contract_address, client.clone());
+
+        // 设置 arb 合约
+        let arb_contract = SudoOpenseaArb::new(
+                config.arb_contract_address, 
+                client.clone()
+            );
 
         Self {
             client,
@@ -177,17 +194,15 @@ impl<M: Middleware + 'static> OpenseaSudoArb<M> {
     }
 
     /// Build arb tx from order hash and sudo pool params.
-    async fn build_arb_tx(
-        &self,
-        order_hash: H256,
-        sudo_pool: H160,
-        sudo_bid: U256,
-    ) -> Option<Action> {
-        // Get full order from Opensea V2 API.
+    /// 从 order hash 和 sudo pool 参数， 构建 arb 套利交易 (arb tx) 
+    async fn build_arb_tx(&self, order_hash: H256, sudo_pool: H160, sudo_bid: U256 ) -> Option<Action> {
+
+        // 从 Opensea V2 API 获取完整的订单
         let response = self
             .opensea_client
             .fulfill_listing(hash_to_fulfill_listing_request(order_hash))
             .await;
+
         let order = match response {
             Ok(order) => order,
             Err(e) => {

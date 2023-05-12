@@ -7,11 +7,14 @@ use ethers::{
 use thiserror::Error;
 
 /// This custom middleware performs an ephemeral state override prior to executoring calls.
+/// 自定义中间件，在执行调用之前执行临时状态覆盖。
 #[derive(Debug)]
 pub struct StateOverrideMiddleware<M> {
     /// The inner middleware
+    /// 内部中间件
     inner: M,
-    /// The state override set we use for calls
+    /// The state override set we use for calls  
+    /// 我们 用于调用 的 状态覆盖 集
     state: spoof::State,
 }
 
@@ -19,8 +22,8 @@ impl<M> StateOverrideMiddleware<M>
 where
     M: Middleware,
 {
-    /// Creates an instance of StateOverrideMiddleware
-    /// `ìnner` the inner Middleware
+    /// Creates an instance of StateOverrideMiddleware `ìnner` the inner Middleware
+    /// 创建 StateOverrideMiddleware 的实例  `ìnner` 内部中间件
     pub fn new(inner: M) -> StateOverrideMiddleware<M> {
         Self {
             inner,
@@ -43,6 +46,7 @@ where
     }
 
     /// Performs a call with the state override.
+    /// 使用状态覆盖执行调用
     async fn call(
         &self,
         tx: &TypedTransaction,
@@ -62,11 +66,13 @@ where
 
 impl<M> StateOverrideMiddleware<M> {
     /// Adds a code override at a given address.
+    /// 在给定地址 添加代码覆盖
     pub fn add_code_to_address(&mut self, address: Address, code: Bytes) {
         self.state.account(address).code(code);
     }
 
     /// Adds a code override at a random address, returning the address.
+    /// 在随机地址 添加代码覆盖，并返回地址
     pub fn add_code(&mut self, code: Bytes) -> Address {
         let address = Address::random();
         self.state.account(address).code(code);
@@ -74,9 +80,10 @@ impl<M> StateOverrideMiddleware<M> {
     }
 }
 
-#[derive(Error, Debug)]
+#[derive(Debug, Error)]
 pub enum StateOverrideMiddlewareError<M: Middleware> {
     /// Thrown when the internal middleware errors
+    /// 内部中间件错误时抛出
     #[error("{0}")]
     MiddlewareError(M::Error),
 }
